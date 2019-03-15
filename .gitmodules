@@ -1,0 +1,6 @@
+[submodule "sources/openssl"]
+	path = sources/openssl
+	url = https://github.com/openssl/openssl.git
+[submodule "sources/cpython"]
+	path = sources/cpython
+	url = https://github.com/python/cpython.git
