@@ -1,6 +1,6 @@
 /opt Python
 ===========
 
-Helpers to build and install a statically linked Python
-with a recent OpenSSL under /opt/<name>/python
+Helpers to build and install an optimised CPython build
+using a recent OpenSSL version under /opt/<name>/python
 
