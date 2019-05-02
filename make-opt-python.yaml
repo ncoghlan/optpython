@@ -1,10 +1,19 @@
 ---
 # Ensures git submodules are up to date, configures them, and builds them,
-# and (temporary) installs them on the current machine.
+# and installs them on the current machine.
 #
-# Last step is expected to be separated out to a separate playbook
+# Installation is required so Python can link against the installed OpenSSL
 
 - hosts: all
+
+  vars:
+    VARIANT_NAME: "{{ lookup('env','USER') }}-python"
+    INSTALL_DIR: "/opt/{{ VARIANT_NAME }}"
+    INSTALLED_LIB_DIR: "{{ INSTALL_DIR }}/lib"
+    INSTALLED_INCLUDE_DIR: "{{ INSTALL_DIR }}/include"
+
+  environment:
+      LD_RUN_PATH: "{{ INSTALLED_LIB_DIR }}"
 
   tasks:
 
@@ -18,10 +27,35 @@
       register: git_result
       changed_when: '"checked out" in git_result.stdout'
 
+    - name: Configure OpenSSL
+      command:
+        ./config shared --prefix={{ INSTALL_DIR }}
+      args:
+        chdir: sources/openssl
+
     - name: Build OpenSSL
       make:
           chdir: sources/openssl
 
-    - name: Build Python 3
+    - name: Install OpenSSL
+      make:
+          chdir: sources/openssl
+          target: install_sw
+      become: yes
+
+    # TODO: Pass --enable-optimizations to the CPython configure call
+    - name: Configure CPython
+      command:
+        ./configure --prefix={{ INSTALL_DIR }} --with-openssl={{ INSTALL_DIR }}
+      args:
+        chdir: sources/cpython
+
+    - name: Build CPython
       make:
           chdir: sources/cpython
+
+    - name: Install CPython
+      make:
+          chdir: sources/cpython
+          target: install
+      become: yes
