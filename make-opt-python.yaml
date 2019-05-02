@@ -1,0 +1,27 @@
+---
+# Ensures git submodules are up to date, configures them, and builds them,
+# and (temporary) installs them on the current machine.
+#
+# Last step is expected to be separated out to a separate playbook
+
+- hosts: all
+
+  tasks:
+
+    # Tricky to use git submodule here, as that doesn't offer a way to ensure
+    # that submodules are up to date without also updating the host repo
+    - name: Ensure git submodules are up to date
+      command:
+        git submodule update --init --recursive
+      args:
+        warn: false
+      register: git_result
+      changed_when: '"checked out" in git_result.stdout'
+
+    - name: Build OpenSSL
+      make:
+          chdir: sources/openssl
+
+    - name: Build Python 3
+      make:
+          chdir: sources/cpython

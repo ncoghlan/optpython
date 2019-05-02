@@ -1,0 +1,26 @@
+---
+# Ensures build dependencies are in place on the build system
+- hosts: all
+
+  tasks:
+    # Can't use "package" here, as the DNF & yum modules don't handle the
+    # 'build-dep' state:
+    #  - https://github.com/ansible/ansible/issues/33371 (dnf)
+    #  - https://github.com/ansible/ansible/issues/48632 (yum)
+    - name: Install the build dependencies for OpenSSL and Python3 (Debian etc)
+      apt:
+        pkg: openssl, python3
+        state: build-dep
+      become: yes
+      when: ansible_pkg_mgr == 'apt'
+      ignore_errors: yes
+
+    - name: Install the build dependencies for OpenSSL and Python3 (Fedora etc)
+      command:
+        dnf builddep -y openssl python3
+      args:
+        warn: false
+      register: dnf_result
+      become: yes
+      when: ansible_pkg_mgr == 'dnf'
+      changed_when: '"Nothing to do" not in dnf_result.stdout'
