@@ -1,8 +1,9 @@
+**Note: this project is on indefinite hiatus, so if you need something along these lines,
+https://github.com/indygreg/python-build-standalone is a better option to consider.**
+
+
 /opt Python
 ===========
-
-Note: this project is on indefinite hiatus, so if you need something along these lines,
-https://github.com/indygreg/python-build-standalone is a better option to consider.
 
 Helpers to build and install an optimised CPython build
 using a recent OpenSSL version under `/opt/$VARIANT_NAME`
